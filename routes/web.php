@@ -1,5 +1,10 @@
 <?php
 
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Exception\TooManyRedirectsException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
@@ -14,14 +19,31 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/' , function () {
-    $location = request()->location ? request()->location : 'Lagos';
-    $route = config('services.base_url.key'). '/' .$location;
-    $res = Http::get($route);
-    
-    return  view('welcome', [
-        'location' => $location,
-        'data' =>$res->json()
+Route::get('/city/{id}', function ($id) {
+    $route =
+        config('services.openweather.url') . 'data/' . config('openweather.weather_api_version', 2.5) . '/weather?q=' . $id . '&appid=' . config('services.openweather.key');
+    $response = Http::get($route);
+    $data =  response($response, 200)->header('Content-Type', 'application/xml');
+    return $data;
+});
+
+Route::get('/', function () {
+    $location = request()->city ? request()->city : 'Oyo';
+    $route =
+        config('services.openweather.url') . 'data/' . config('openweather.weather_api_version', 2.5) . '/weather?q=' . $location . '&appid=' . config('services.openweather.key');
+    $response = Http::get($route);
+    if (
+        $response->failed() == true |
+        $response->status() != 200
+    ) {
+        $response = response()->json(['message' => 'not a valid city', 'code' => '404'], 404);
+        return $response;
+    }
+    return  view(
+        'welcome',
+        [
+            'city' => $location,
+            'data' => $response
         ]
     );
 });

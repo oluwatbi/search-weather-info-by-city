@@ -446,12 +446,13 @@
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
             <h1>Search City Here</h1>
             <form class="example">
-                <input type="text" placeholder="Search.." name="location">
+                <input type="text" placeholder="Search.." name="city">
                 <button type="submit">Find </button>
             </form>
 
 
-            <h1>{{ ucfirst($location)}} weather description : {{ ucfirst($data['weather'][0]['description']) }}</h2>
+
+            <h1>{{ ucfirst($city)}} weather description : {{ ucfirst($data['weather'][0]['description']) }}</h2>
 
         </div>
     </div>
