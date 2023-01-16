@@ -24,6 +24,10 @@ Route::get('/city/{id}', function ($id) {
     $route =
         config('services.openweather.url') . 'data/' . config('openweather.weather_api_version', 2.5) . '/weather?q=' . $id . '&appid=' . config('services.openweather.key');
     $response = Http::get($route);
+    if($response->status() != 200) {
+        $output = response($response->json(), 404);
+        return $output;
+    }
     $data = json_decode($response,true);
     $result = ArrayToXml::convert($data);
     return response($result)->header('Content-Type', 'application/xml');
