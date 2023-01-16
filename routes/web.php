@@ -1,5 +1,6 @@
 <?php
 
+use Spatie\ArrayToXml\ArrayToXml;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
@@ -23,8 +24,9 @@ Route::get('/city/{id}', function ($id) {
     $route =
         config('services.openweather.url') . 'data/' . config('openweather.weather_api_version', 2.5) . '/weather?q=' . $id . '&appid=' . config('services.openweather.key');
     $response = Http::get($route);
-    $data =  response($response, 200)->header('Content-Type', 'application/xml');
-    return $data;
+    $data = json_decode($response,true);
+    $result = ArrayToXml::convert($data);
+    return response($result)->header('Content-Type', 'application/xml');
 });
 
 Route::get('/', function () {
